@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 19:27:03 by shunwata          #+#    #+#             */
-/*   Updated: 2025/07/12 20:47:13 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/07/13 13:22:38 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,25 +85,29 @@ void execute_first_command(char *infile, char *cmd1, char **envp, int *pipe_fd)
     error_exit("execve cmd1");
 }
 
-// void execute_second_command(char *outfile, char *cmd2, int *pipe_fd)
-// {
-//     int outfile_fd;
-//     char **args;
+void execute_second_command(char *outfile, char *cmd2, char **envp, int *pipe_fd)
+{
+    int outfile_fd;
+    char    **cmd_args;
+    char    *cmd_fullpath;
 
-//     outfile_fd = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-//     if (outfile_fd == -1)
-//         error_exit("open outfile");
-//     if (dup2(pipe_fd[0], STDIN_FILENO) == -1)
-//         error_exit("dup2 stdin");
-//     if (dup2(outfile_fd, STDOUT_FILENO) == -1)
-//         error_exit("dup2 stdout");
-//     close(outfile_fd);
-//     close(pipe_fd[0]);
-//     close(pipe_fd[1]);
-//     args = split_command(cmd2);
-//     execve(args[0], args, NULL);
-//     error_exit("execve cmd2");
-// }
+    outfile_fd = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (outfile_fd == -1)
+        error_exit("open outfile");
+    if (dup2(pipe_fd[0], STDIN_FILENO) == -1)
+        error_exit("dup2 stdin");
+    if (dup2(outfile_fd, STDOUT_FILENO) == -1)
+        error_exit("dup2 stdout");
+    close(outfile_fd);
+    close(pipe_fd[0]);
+    close(pipe_fd[1]);
+    cmd_args = ft_split(cmd2, ' ');
+    if (!cmd_args)
+        error_exit("ft_split");
+    cmd_fullpath = find_fullpath(cmd_args[0], envp);
+    execve(cmd_fullpath, cmd_args, envp);
+    error_exit("execve cmd2");
+}
 
 int main(int argc, char **argv, char **envp)
 {
