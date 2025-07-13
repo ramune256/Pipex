@@ -6,16 +6,14 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 19:27:03 by shunwata          #+#    #+#             */
-/*   Updated: 2025/07/13 13:22:38 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/07/13 15:38:24 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <fcntl.h>
-#include <string.h>
 
 void error_exit(const char *message)
 {
@@ -23,42 +21,75 @@ void error_exit(const char *message)
     exit(1);
 }
 
-char **ft_strjoin_wraper(char *s1, char *s2)
+void free_2d_array(char **array)
 {
-    char    **result;
+    size_t i;
 
-    result = ft_strjoin(*s1, *s2);
-    if (!result)
-        error_exit("ft_strjoin");
-    return (result);
+    if (!array)
+        return;
+    i = 0;
+    while (array[i])
+    {
+        free(array[i]);
+        i++;
+    }
+    free(array);
 }
 
-char *find_fullpath(char *cmd_name, char **envp)
+char *find_envp_path(char **envp)
 {
-    char    **bin_path;
-    char    *fullpath;
-    char    *tmp;
+    size_t i;
 
     if (!envp)
-        exit(write(2, "NULL envp\n", 10));
-    while (*envp && ft_strncmp(*envp, "PATH=", 5) != 0)
-        envp++;
-    if (!*envp)
-        exit(write(2, "path not found\n", 15));
-    bin_path = ft_split(*envp + 5, ':');
-    if (!bin_path)
-        error_exit("ft_split");
-    while (*bin_path)
+        return (NULL);
+    i = 0;
+    while (envp[i] && ft_strncmp(envp[i], "PATH=", 5) != 0)
+        i++;
+    if (!envp[i])
+        return (NULL);
+    return (envp[i] + 5);
+}
+
+char *join_path(char *bin_dir, char *cmd_name)
+{
+    size_t  total_len;
+    char    *fullpath;
+
+    total_len = ft_strlen(bin_dir) + ft_strlen(cmd_name) + 1;
+    fullpath = malloc(sizeof(char) * (total_len + 1));
+    if (!fullpath)
+        return (NULL);
+    ft_strlcpy(fullpath, bin_dir, total_len + 1);
+    ft_strlcat(fullpath, "/", total_len + 1);
+    ft_strlcat(fullpath, cmd_name, total_len + 1);
+    return (fullpath);
+}
+
+char *get_fullpath(char *cmd_name, char **envp)
+{
+    char    **bin_dir;
+    char    *envp_path;
+    char    *fullpath;
+    size_t     i;
+
+    envp_path = find_envp_path(envp);
+    if (!envp_path)
+        return (NULL);
+    bin_dir = ft_split(envp_path, ':');
+    if (!bin_dir)
+        return (NULL);
+    i = 0;
+    while (bin_dir[i])
     {
-        tmp = ft_strjoin_wraper(*bin_path, "/");
-        fullpath = ft_strjoin_wraper(tmp, cmd_name);
-        free(tmp);
+        fullpath = join_path(bin_dir[i], cmd_name);
+        if (!fullpath)
+            return (free_2d_array(bin_dir), NULL);
         if (access(fullpath, X_OK) == 0)
-            return (fullpath);
+            return (free_2d_array(bin_dir), fullpath);
         free(fullpath);
-        bin_path++;
+        i++;
     }
-    exit(write(2, "command not found\n", 18));
+    return (free_2d_array(bin_dir), NULL);
 }
 
 void execute_first_command(char *infile, char *cmd1, char **envp, int *pipe_fd)
@@ -80,14 +111,18 @@ void execute_first_command(char *infile, char *cmd1, char **envp, int *pipe_fd)
     cmd_args = ft_split(cmd1, ' ');
     if (!cmd_args)
         error_exit("ft_split");
-    cmd_fullpath = find_fullpath(cmd_args[0], envp);
+    cmd_fullpath = get_fullpath(cmd_args[0], envp);
+    if (!cmd_fullpath)
+        error_exit("can't get path");
     execve(cmd_fullpath, cmd_args, envp);
+    free(cmd_fullpath);
+    free_2d_array(cmd_args);
     error_exit("execve cmd1");
 }
 
 void execute_second_command(char *outfile, char *cmd2, char **envp, int *pipe_fd)
 {
-    int outfile_fd;
+    int     outfile_fd;
     char    **cmd_args;
     char    *cmd_fullpath;
 
@@ -104,8 +139,12 @@ void execute_second_command(char *outfile, char *cmd2, char **envp, int *pipe_fd
     cmd_args = ft_split(cmd2, ' ');
     if (!cmd_args)
         error_exit("ft_split");
-    cmd_fullpath = find_fullpath(cmd_args[0], envp);
+    cmd_fullpath = get_fullpath(cmd_args[0], envp);
+    if (!cmd_fullpath)
+        error_exit("malloc");
     execve(cmd_fullpath, cmd_args, envp);
+    free(cmd_fullpath);
+    free_2d_array(cmd_args);
     error_exit("execve cmd2");
 }
 
