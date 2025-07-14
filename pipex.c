@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 19:27:03 by shunwata          #+#    #+#             */
-/*   Updated: 2025/07/14 20:26:06 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/07/14 20:52:27 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,11 @@ void	error_exit(const char *message)
 
 void	close_fd(int fd1, int fd2, int fd3)
 {
-	if (fd1 != NULL)
+	if (fd1 != -1)
 		close(fd1);
-	if (fd2 != NULL)
+	if (fd2 != -1)
 		close(fd2);
-	if (fd3 != NULL)
+	if (fd3 != -1)
 		close(fd3);
 }
 
@@ -44,6 +44,13 @@ void	free_2d_array(char **array)
 		i++;
 	}
 	free(array);
+}
+
+char	*direct_path(char *cmd_name)
+{
+	if (access(cmd_name, X_OK) == 0)
+		return (ft_strdup(cmd_name));
+	return (NULL);
 }
 
 char	*find_envp_path(char **envp)
@@ -82,6 +89,8 @@ char	*get_fullpath(char *cmd_name, char **envp)
 	char	*fullpath;
 	size_t	i;
 
+	if (ft_strchr(cmd_name, '/'))
+		return (direct_path(cmd_name));
 	envp_path = find_envp_path(envp);
 	if (!envp_path)
 		return (NULL);
@@ -121,7 +130,10 @@ void	execute_first_command(char *infile, char *cmd1, char **envp, int *pipe_fd)
 		error_exit("ft_split");
 	cmd_fullpath = get_fullpath(cmd_args[0], envp);
 	if (!cmd_fullpath)
-		error_exit("couldn't get path");
+	{
+		free_2d_array(cmd_args);
+		error_exit("can't get path");
+	}
 	execve(cmd_fullpath, cmd_args, envp);
 	free(cmd_fullpath);
 	free_2d_array(cmd_args);
@@ -147,7 +159,10 @@ void	execute_second_command(char *outfile, char *cmd2, char **envp, int *pipe_fd
 		error_exit("ft_split");
 	cmd_fullpath = get_fullpath(cmd_args[0], envp);
 	if (!cmd_fullpath)
-		error_exit("couldn't get path");
+	{
+		free_2d_array(cmd_args);
+		error_exit("can't get path");
+	}
 	execve(cmd_fullpath, cmd_args, envp);
 	free(cmd_fullpath);
 	free_2d_array(cmd_args);
@@ -175,7 +190,7 @@ int	main(int argc, char **argv, char **envp)
 		error_exit("fork");
 	if (pid2 == 0)
 		execute_second_command(argv[4], argv[3], envp, pipe_fd);
-	close_fd(pipe_fd[0], pipe_fd[1], NULL);
+	close_fd(pipe_fd[0], pipe_fd[1], -1);
 	waitpid(pid1, &status, 0);
 	waitpid(pid2, &status, 0);
 	return (0);
