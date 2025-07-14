@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 19:27:03 by shunwata          #+#    #+#             */
-/*   Updated: 2025/07/14 20:13:22 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/07/14 20:26:06 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,23 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 
-void error_exit(const char *message)
+void	error_exit(const char *message)
 {
 	perror(message);
 	exit(1);
 }
 
-void free_2d_array(char **array)
+void	close_fd(int fd1, int fd2, int fd3)
+{
+	if (fd1 != NULL)
+		close(fd1);
+	if (fd2 != NULL)
+		close(fd2);
+	if (fd3 != NULL)
+		close(fd3);
+}
+
+void	free_2d_array(char **array)
 {
 	size_t	i;
 
@@ -36,7 +46,7 @@ void free_2d_array(char **array)
 	free(array);
 }
 
-char *find_envp_path(char **envp)
+char	*find_envp_path(char **envp)
 {
 	size_t	i;
 
@@ -50,7 +60,7 @@ char *find_envp_path(char **envp)
 	return (envp[i] + 5);
 }
 
-char *join_path(char *bin_dir, char *cmd_name)
+char	*join_path(char *bin_dir, char *cmd_name)
 {
 	size_t	total_len;
 	char	*fullpath;
@@ -65,7 +75,7 @@ char *join_path(char *bin_dir, char *cmd_name)
 	return (fullpath);
 }
 
-char *get_fullpath(char *cmd_name, char **envp)
+char	*get_fullpath(char *cmd_name, char **envp)
 {
 	char	**bin_dir;
 	char	*envp_path;
@@ -92,7 +102,7 @@ char *get_fullpath(char *cmd_name, char **envp)
 	return (free_2d_array(bin_dir), NULL);
 }
 
-void execute_first_command(char *infile, char *cmd1, char **envp, int *pipe_fd)
+void	execute_first_command(char *infile, char *cmd1, char **envp, int *pipe_fd)
 {
 	int		infile_fd;
 	char	**cmd_args;
@@ -105,22 +115,20 @@ void execute_first_command(char *infile, char *cmd1, char **envp, int *pipe_fd)
 		error_exit("dup2 stdin");
 	if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
 		error_exit("dup2 stdout");
-	close(infile_fd);
-	close(pipe_fd[0]);
-	close(pipe_fd[1]);
+	close_fd(infile_fd, pipe_fd[0], pipe_fd[1]);
 	cmd_args = ft_split(cmd1, ' ');
 	if (!cmd_args)
 		error_exit("ft_split");
 	cmd_fullpath = get_fullpath(cmd_args[0], envp);
 	if (!cmd_fullpath)
-		error_exit("can't get path");
+		error_exit("couldn't get path");
 	execve(cmd_fullpath, cmd_args, envp);
 	free(cmd_fullpath);
 	free_2d_array(cmd_args);
 	error_exit("execve cmd1");
 }
 
-void execute_second_command(char *outfile, char *cmd2, char **envp, int *pipe_fd)
+void	execute_second_command(char *outfile, char *cmd2, char **envp, int *pipe_fd)
 {
 	int		outfile_fd;
 	char	**cmd_args;
@@ -133,22 +141,20 @@ void execute_second_command(char *outfile, char *cmd2, char **envp, int *pipe_fd
 		error_exit("dup2 stdin");
 	if (dup2(outfile_fd, STDOUT_FILENO) == -1)
 		error_exit("dup2 stdout");
-	close(outfile_fd);
-	close(pipe_fd[0]);
-	close(pipe_fd[1]);
+	close_fd(outfile_fd, pipe_fd[0], pipe_fd[1]);
 	cmd_args = ft_split(cmd2, ' ');
 	if (!cmd_args)
 		error_exit("ft_split");
 	cmd_fullpath = get_fullpath(cmd_args[0], envp);
 	if (!cmd_fullpath)
-		error_exit("malloc");
+		error_exit("couldn't get path");
 	execve(cmd_fullpath, cmd_args, envp);
 	free(cmd_fullpath);
 	free_2d_array(cmd_args);
 	error_exit("execve cmd2");
 }
 
-int main(int argc, char **argv, char **envp)
+int	main(int argc, char **argv, char **envp)
 {
 	int		pipe_fd[2];
 	pid_t	pid1;
@@ -169,8 +175,7 @@ int main(int argc, char **argv, char **envp)
 		error_exit("fork");
 	if (pid2 == 0)
 		execute_second_command(argv[4], argv[3], envp, pipe_fd);
-	close(pipe_fd[0]);
-	close(pipe_fd[1]);
+	close_fd(pipe_fd[0], pipe_fd[1], NULL);
 	waitpid(pid1, &status, 0);
 	waitpid(pid2, &status, 0);
 	return (0);
