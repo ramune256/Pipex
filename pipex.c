@@ -6,14 +6,16 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 19:27:03 by shunwata          #+#    #+#             */
-/*   Updated: 2025/07/14 20:52:27 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/07/19 13:51:29 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+#include "libft.h"
 
 void	error_exit(const char *message)
 {
