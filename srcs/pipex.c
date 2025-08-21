@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 19:27:03 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/21 19:04:20 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/21 19:21:05 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,8 +201,9 @@ int	main(int argc, char **argv, char **envp)
 	int		pipe_fd[2];
 	pid_t	pid1;
 	pid_t	pid2;
-	int		status1;
 	int		status2;
+	int		i;
+	int		exit_status;
 
 	if (argc != 5)
 		return (ft_putendl_fd("Usage: ./pipex infile cmd1 cmd2 outfile", 2), 1);
@@ -219,9 +220,17 @@ int	main(int argc, char **argv, char **envp)
 	if (pid2 == 0)
 		execute_second_command(argv[4], argv[3], envp, pipe_fd);
 	close_fd(pipe_fd[0], pipe_fd[1], -1);
-	waitpid(pid1, &status1, 0);
-	waitpid(pid2, &status2, 0);
-	if (WIFEXITED(status2))
-		return (WEXITSTATUS(status2));
-	return (1);
+
+	i = 0;
+	while (i < 2)
+	{
+		if (wait(&status2) == pid2)
+		{
+			exit_status = 1;
+			if (WIFEXITED(status2))
+				exit_status = WEXITSTATUS(status2);
+		}
+		i++;
+	}
+	return (exit_status);
 }
