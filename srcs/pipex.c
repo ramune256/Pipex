@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 19:27:03 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/21 19:57:30 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/21 20:08:32 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,20 +26,21 @@ void	malloc_failed(void)
 
 void	command_not_found(char **cmd_args)
 {
-	free_2d_array(cmd_args);
 	ft_putstr_fd("pipex: ", 2);
 	ft_putstr_fd(cmd_args[0], 2);
 	ft_putendl_fd(": command not found", 2);
+	free_2d_array(cmd_args);
 	exit(127);
 }
 
-void	permission_denied(char *cmd_name, char *fullpath, char **bin_dir)
+void	permission_denied(char **cmd_args, char *fullpath, char **bin_dir)
 {
+	ft_putstr_fd("pipex: ", 2);
+	ft_putstr_fd(cmd_args[0], 2);
+	ft_putendl_fd(": permission denied", 2);
+	free_2d_array(cmd_args);
 	free(fullpath);
 	free_2d_array(bin_dir);
-	ft_putstr_fd("pipex: ", 2);
-	ft_putstr_fd(cmd_name, 2);
-	ft_putendl_fd(": permission denied", 2);
 	exit(126);
 }
 
@@ -104,16 +105,16 @@ char	*join_path(char *bin_dir, char *cmd_name)
 	return (fullpath);
 }
 
-char	*get_fullpath(char *cmd_name, char **envp)
+char	*get_fullpath(char **cmd_args, char **envp)
 {
 	char	**bin_dir;
 	char	*envp_path;
 	char	*fullpath;
 	size_t	i;
 
-	if (ft_strchr(cmd_name, '/'))
+	if (ft_strchr(cmd_args[0], '/'))
 		// return (direct_path(cmd_name));
-		return (ft_strdup(cmd_name));
+		return (ft_strdup(cmd_args[0]));
 	envp_path = find_envp_path(envp);
 	if (!envp_path)
 		return (NULL);
@@ -123,14 +124,14 @@ char	*get_fullpath(char *cmd_name, char **envp)
 	i = 0;
 	while (bin_dir[i])
 	{
-		fullpath = join_path(bin_dir[i], cmd_name);
+		fullpath = join_path(bin_dir[i], cmd_args[0]);
 		if (!fullpath)
 			return (free_2d_array(bin_dir), NULL);
 		if (access(fullpath, F_OK) == 0)
 		{
 			if (access(fullpath, X_OK) == 0)
 				return (free_2d_array(bin_dir), fullpath);
-			permission_denied(cmd_name, fullpath, bin_dir);
+			permission_denied(cmd_args, fullpath, bin_dir);
 		}
 		free(fullpath);
 		i++;
