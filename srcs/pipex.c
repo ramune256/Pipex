@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 19:27:03 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/21 20:08:32 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/21 20:10:13 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,7 +157,7 @@ void	execute_first_command(char *infile, char *cmd1, char **envp, int *pipe_fd)
 	cmd_args = split_improved(cmd1);
 	if (!cmd_args)
 		malloc_failed();
-	cmd_fullpath = get_fullpath(cmd_args[0], envp);
+	cmd_fullpath = get_fullpath(cmd_args, envp);
 	if (!cmd_fullpath)
 		command_not_found(cmd_args);
 	execve(cmd_fullpath, cmd_args, envp);
@@ -184,7 +184,7 @@ void	execute_second_command(char *outfile, char *cmd2, char **envp, int *pipe_fd
 	cmd_args = split_improved(cmd2);
 	if (!cmd_args)
 		malloc_failed();
-	cmd_fullpath = get_fullpath(cmd_args[0], envp);
+	cmd_fullpath = get_fullpath(cmd_args, envp);
 	if (!cmd_fullpath)
 		command_not_found(cmd_args);
 	execve(cmd_fullpath, cmd_args, envp);
