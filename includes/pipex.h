@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 18:32:49 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/21 18:43:24 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/21 18:51:34 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,4 +23,4 @@
 void	free_2d_array(char **array);
 char	**split_improved(const char *s);
 
-#endif PIPEX_H
+#endif
