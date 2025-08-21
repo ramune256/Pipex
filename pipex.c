@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 19:27:03 by shunwata          #+#    #+#             */
-/*   Updated: 2025/07/19 13:51:29 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/21 03:10:14 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,20 @@ void	error_exit(const char *message)
 {
 	perror(message);
 	exit(1);
+}
+
+void	malloc_failed(void)
+{
+	ft_putendl_fd("pipex: memory allocation failed", 2);
+	exit(1);
+}
+
+void	command_not_found(char *cmd_name)
+{
+	ft_putstr_fd("pipex: ", 2);
+	ft_putstr_fd(cmd_name, 2);
+	ft_putendl_fd(": command not found", 2);
+	exit(127);
 }
 
 void	close_fd(int fd1, int fd2, int fd3)
@@ -129,12 +143,12 @@ void	execute_first_command(char *infile, char *cmd1, char **envp, int *pipe_fd)
 	close_fd(infile_fd, pipe_fd[0], pipe_fd[1]);
 	cmd_args = ft_split(cmd1, ' ');
 	if (!cmd_args)
-		error_exit("ft_split");
+		malloc_failed();
 	cmd_fullpath = get_fullpath(cmd_args[0], envp);
 	if (!cmd_fullpath)
 	{
 		free_2d_array(cmd_args);
-		error_exit("can't get path");
+		command_not_found(cmd_args[0]);
 	}
 	execve(cmd_fullpath, cmd_args, envp);
 	free(cmd_fullpath);
@@ -158,12 +172,12 @@ void	execute_second_command(char *outfile, char *cmd2, char **envp, int *pipe_fd
 	close_fd(outfile_fd, pipe_fd[0], pipe_fd[1]);
 	cmd_args = ft_split(cmd2, ' ');
 	if (!cmd_args)
-		error_exit("ft_split");
+		malloc_failed();
 	cmd_fullpath = get_fullpath(cmd_args[0], envp);
 	if (!cmd_fullpath)
 	{
 		free_2d_array(cmd_args);
-		error_exit("can't get path");
+		command_not_found(cmd_args[0]);
 	}
 	execve(cmd_fullpath, cmd_args, envp);
 	free(cmd_fullpath);
@@ -176,10 +190,11 @@ int	main(int argc, char **argv, char **envp)
 	int		pipe_fd[2];
 	pid_t	pid1;
 	pid_t	pid2;
-	int		status;
+	int		status1;
+	int		status2;
 
 	if (argc != 5)
-		return (write(2, "Usage: ./pipex infile cmd1 cmd2 outfile\n", 41), 1);
+		return (ft_putendl_fd("Usage: ./pipex infile cmd1 cmd2 outfile", 2), 1);
 	if (pipe(pipe_fd) == -1)
 		error_exit("pipe");
 	pid1 = fork();
@@ -193,7 +208,9 @@ int	main(int argc, char **argv, char **envp)
 	if (pid2 == 0)
 		execute_second_command(argv[4], argv[3], envp, pipe_fd);
 	close_fd(pipe_fd[0], pipe_fd[1], -1);
-	waitpid(pid1, &status, 0);
-	waitpid(pid2, &status, 0);
-	return (0);
+	waitpid(pid1, &status1, 0);
+	waitpid(pid2, &status2, 0);
+	if (WIFEXITED(status2))
+		return (WEXITSTATUS(status2));
+	return (1);
 }
