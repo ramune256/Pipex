@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 19:27:03 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/21 20:10:13 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/21 20:39:29 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,14 +33,12 @@ void	command_not_found(char **cmd_args)
 	exit(127);
 }
 
-void	permission_denied(char **cmd_args, char *fullpath, char **bin_dir)
+void	permission_denied(char **cmd_args)
 {
 	ft_putstr_fd("pipex: ", 2);
 	ft_putstr_fd(cmd_args[0], 2);
 	ft_putendl_fd(": permission denied", 2);
 	free_2d_array(cmd_args);
-	free(fullpath);
-	free_2d_array(bin_dir);
 	exit(126);
 }
 
@@ -111,6 +109,7 @@ char	*get_fullpath(char **cmd_args, char **envp)
 	char	*envp_path;
 	char	*fullpath;
 	size_t	i;
+	int		perm;
 
 	if (ft_strchr(cmd_args[0], '/'))
 		// return (direct_path(cmd_name));
@@ -122,6 +121,7 @@ char	*get_fullpath(char **cmd_args, char **envp)
 	if (!bin_dir)
 		return (NULL);
 	i = 0;
+	perm = 0;
 	while (bin_dir[i])
 	{
 		fullpath = join_path(bin_dir[i], cmd_args[0]);
@@ -131,11 +131,13 @@ char	*get_fullpath(char **cmd_args, char **envp)
 		{
 			if (access(fullpath, X_OK) == 0)
 				return (free_2d_array(bin_dir), fullpath);
-			permission_denied(cmd_args, fullpath, bin_dir);
+			perm = 1;
 		}
 		free(fullpath);
 		i++;
 	}
+	if (perm)
+		permission_denied(cmd_args);
 	return (free_2d_array(bin_dir), NULL);
 }
 
@@ -218,16 +220,15 @@ int	main(int argc, char **argv, char **envp)
 		execute_second_command(argv[4], argv[3], envp, pipe_fd);
 	close_fd(pipe_fd[0], pipe_fd[1], -1);
 
-	i = 0;
-	while (i < 2)
+	i = 2;
+	exit_status = 1;
+	while (i--)
 	{
 		if (wait(&status2) == pid2)
 		{
-			exit_status = 1;
 			if (WIFEXITED(status2))
 				exit_status = WEXITSTATUS(status2);
 		}
-		i++;
 	}
 	return (exit_status);
 }
