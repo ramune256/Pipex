@@ -1,26 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/31 15:29:17 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/18 15:51:05 by shunwata         ###   ########.fr       */
+/*   Created: 2025/08/21 18:32:49 by shunwata          #+#    #+#             */
+/*   Updated: 2025/08/21 18:43:24 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#ifndef PIPEX_H
+# define PIPEX_H
 
-# include <unistd.h>
 # include <stdlib.h>
+# include <unistd.h>
+# include <stdio.h>
+# include <sys/wait.h>
+# include <fcntl.h>
 # include "libft.h"
 
-# ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 1024
-# endif
+void	free_2d_array(char **array);
+char	**split_improved(const char *s);
 
-char	*get_next_line(int fd);
-
-#endif
+#endif PIPEX_H

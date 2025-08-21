@@ -6,16 +6,11 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 19:27:03 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/21 03:10:14 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/21 18:45:12 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <sys/wait.h>
-#include <fcntl.h>
-#include "libft.h"
+#include "pipex.h"
 
 void	error_exit(const char *message)
 {
@@ -141,7 +136,8 @@ void	execute_first_command(char *infile, char *cmd1, char **envp, int *pipe_fd)
 	if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
 		error_exit("dup2 stdout");
 	close_fd(infile_fd, pipe_fd[0], pipe_fd[1]);
-	cmd_args = ft_split(cmd1, ' ');
+	// cmd_args = ft_split(cmd1, ' ');
+	cmd_args = split_improved(cmd1);
 	if (!cmd_args)
 		malloc_failed();
 	cmd_fullpath = get_fullpath(cmd_args[0], envp);
@@ -170,7 +166,8 @@ void	execute_second_command(char *outfile, char *cmd2, char **envp, int *pipe_fd
 	if (dup2(outfile_fd, STDOUT_FILENO) == -1)
 		error_exit("dup2 stdout");
 	close_fd(outfile_fd, pipe_fd[0], pipe_fd[1]);
-	cmd_args = ft_split(cmd2, ' ');
+	// cmd_args = ft_split(cmd2, ' ');
+	cmd_args = split_improved(cmd2);
 	if (!cmd_args)
 		malloc_failed();
 	cmd_fullpath = get_fullpath(cmd_args[0], envp);
