@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 19:27:03 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/21 19:56:07 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/21 19:57:30 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ char	*get_fullpath(char *cmd_name, char **envp)
 
 	if (ft_strchr(cmd_name, '/'))
 		// return (direct_path(cmd_name));
-		return (strdup(cmd_name));
+		return (ft_strdup(cmd_name));
 	envp_path = find_envp_path(envp);
 	if (!envp_path)
 		return (NULL);
