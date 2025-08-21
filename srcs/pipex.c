@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 19:27:03 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/21 19:21:05 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/21 19:56:07 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,11 @@ void	malloc_failed(void)
 	exit(1);
 }
 
-void	command_not_found(char *cmd_name)
+void	command_not_found(char **cmd_args)
 {
+	free_2d_array(cmd_args);
 	ft_putstr_fd("pipex: ", 2);
-	ft_putstr_fd(cmd_name, 2);
+	ft_putstr_fd(cmd_args[0], 2);
 	ft_putendl_fd(": command not found", 2);
 	exit(127);
 }
@@ -67,12 +68,12 @@ void	free_2d_array(char **array)
 	free(array);
 }
 
-char	*direct_path(char *cmd_name)
-{
-	if (access(cmd_name, X_OK) == 0)
-		return (ft_strdup(cmd_name));
-	return (NULL);
-}
+// char	*direct_path(char *cmd_name)
+// {
+// 	if (access(cmd_name, X_OK) == 0)
+// 		return (ft_strdup(cmd_name));
+// 	return (NULL);
+// }
 
 char	*find_envp_path(char **envp)
 {
@@ -111,7 +112,8 @@ char	*get_fullpath(char *cmd_name, char **envp)
 	size_t	i;
 
 	if (ft_strchr(cmd_name, '/'))
-		return (direct_path(cmd_name));
+		// return (direct_path(cmd_name));
+		return (strdup(cmd_name));
 	envp_path = find_envp_path(envp);
 	if (!envp_path)
 		return (NULL);
@@ -156,10 +158,7 @@ void	execute_first_command(char *infile, char *cmd1, char **envp, int *pipe_fd)
 		malloc_failed();
 	cmd_fullpath = get_fullpath(cmd_args[0], envp);
 	if (!cmd_fullpath)
-	{
-		free_2d_array(cmd_args);
-		command_not_found(cmd_args[0]);
-	}
+		command_not_found(cmd_args);
 	execve(cmd_fullpath, cmd_args, envp);
 	free(cmd_fullpath);
 	free_2d_array(cmd_args);
@@ -186,10 +185,7 @@ void	execute_second_command(char *outfile, char *cmd2, char **envp, int *pipe_fd
 		malloc_failed();
 	cmd_fullpath = get_fullpath(cmd_args[0], envp);
 	if (!cmd_fullpath)
-	{
-		free_2d_array(cmd_args);
-		command_not_found(cmd_args[0]);
-	}
+		command_not_found(cmd_args);
 	execve(cmd_fullpath, cmd_args, envp);
 	free(cmd_fullpath);
 	free_2d_array(cmd_args);
