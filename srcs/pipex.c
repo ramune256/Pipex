@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 19:27:03 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/21 18:45:12 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/21 19:04:20 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,16 @@ void	command_not_found(char *cmd_name)
 	ft_putstr_fd(cmd_name, 2);
 	ft_putendl_fd(": command not found", 2);
 	exit(127);
+}
+
+void	permission_denied(char *cmd_name, char *fullpath, char **bin_dir)
+{
+	free(fullpath);
+	free_2d_array(bin_dir);
+	ft_putstr_fd("pipex: ", 2);
+	ft_putstr_fd(cmd_name, 2);
+	ft_putendl_fd(": permission denied", 2);
+	exit(126);
 }
 
 void	close_fd(int fd1, int fd2, int fd3)
@@ -114,8 +124,12 @@ char	*get_fullpath(char *cmd_name, char **envp)
 		fullpath = join_path(bin_dir[i], cmd_name);
 		if (!fullpath)
 			return (free_2d_array(bin_dir), NULL);
-		if (access(fullpath, X_OK) == 0)
-			return (free_2d_array(bin_dir), fullpath);
+		if (access(fullpath, F_OK) == 0)
+		{
+			if (access(fullpath, X_OK) == 0)
+				return (free_2d_array(bin_dir), fullpath);
+			permission_denied(cmd_name, fullpath, bin_dir);
+		}
 		free(fullpath);
 		i++;
 	}
