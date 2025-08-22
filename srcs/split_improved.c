@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 15:24:59 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/22 17:40:40 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/22 19:26:10 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,20 +57,52 @@ static void	find_next_word(const char *s, int *i, int *start)
 	}
 }
 
+static char	*remove_single_quotes(const char *s)
+{
+	char	*dst;
+	size_t	src_len;
+	size_t	i;
+	size_t	dst_i;
+
+	if (!s)
+		return (NULL);
+	src_len = ft_strlen(s);
+	dst = (char *)malloc(src_len + 1);
+	if (!dst)
+		return (NULL);
+	i = 0;
+	dst_i = 0;
+	while (i < src_len)
+	{
+		if (s[i] != '\'')
+			dst[dst_i++] = s[i];
+		i++;
+	}
+	dst[dst_i] = '\0';
+	return (dst);
+}
+
 static char	**fill(const char *s, char **result, int word_count)
 {
 	int		i;
 	int		word_index;
 	int		start;
+	char	*str;
+	char	*str_noquotes;
 
 	i = 0;
 	word_index = 0;
 	while (word_index < word_count)
 	{
 		find_next_word(s, &i, &start);
-		result[word_index] = ft_substr(s, start, i - start);
-		if (!result[word_index])
+		str = ft_substr(s, start, i - start);
+		if (!str)
 			return (free_2d_array(result), NULL);
+		str_noquotes = remove_single_quotes(str);
+		free(str);
+		if (!str_noquotes)
+			return (free_2d_array(result), NULL);
+		result[word_index] = str_noquotes;
 		word_index++;
 	}
 	return (result);
