@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 13:57:47 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/22 13:58:37 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/22 17:43:29 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void	free_2d_array(char **array)
 	size_t	i;
 
 	if (!array)
-		return;
+		return ;
 	i = 0;
 	while (array[i])
 	{
