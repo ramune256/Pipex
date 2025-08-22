@@ -29,8 +29,10 @@ run_case() {
   out_b="$WORK_DIR/${case_name}.bash.out"
   err_p="$WORK_DIR/${case_name}.pipex.err"
   err_b="$WORK_DIR/${case_name}.bash.err"
+  err_pn="$WORK_DIR/${case_name}.pipex.err.norm"
+  err_bn="$WORK_DIR/${case_name}.bash.err.norm"
 
-  rm -f "$out_p" "$out_b" "$err_p" "$err_b"
+  rm -f "$out_p" "$out_b" "$err_p" "$err_b" "$err_pn" "$err_bn"
 
   # Temporarily disable -e so failures don't abort the script
   set +e
@@ -42,8 +44,13 @@ run_case() {
   status_b=$?
   set -e
 
+  # Normalize stderr to ignore shell-specific prefixes like "_: line N: " or "pipex: "
+  # Keep from the path onward: e.g., "/no/such/cmd: No such file or directory"
+  sed -E 's@^[^:]*: (line [0-9]+: )?@@' "$err_p" > "$err_pn" || true
+  sed -E 's@^[^:]*: (line [0-9]+: )?@@' "$err_b" > "$err_bn" || true
+
   diff_out="$(diff -u -- "$out_b" "$out_p" 2>&1 || true)"
-  diff_err="$(diff -u -- "$err_b" "$err_p" 2>&1 || true)"
+  diff_err="$(diff -u -- "$err_bn" "$err_pn" 2>&1 || true)"
 
   if [ "$status_p" -eq "$status_b" ] && [ -z "$diff_out" ] && [ -z "$diff_err" ]; then
     log "[PASS] $case_name"
