@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 18:32:49 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/22 14:03:09 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/22 18:54:36 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ void	free_2d_array(char **array);
 void	malloc_failed(void);
 void	command_not_found(char **cmd_args);
 void	permission_denied(char **cmd_args);
+void	no_such_file_or_directory(char **cmd_args);
+void	is_a_directory(char **cmd_args);
 char	**split_improved(const char *s);
 
 #endif
