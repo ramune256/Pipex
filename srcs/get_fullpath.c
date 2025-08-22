@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 13:55:58 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/23 00:32:00 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/23 01:55:53 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,17 +41,21 @@ static char	*join_path(char *bin_dir, char *cmd_name)
 	return (fullpath);
 }
 
-static char	*check_path_and_perm(char **bin_dir, char *cmd_name, int *perm_err)
+static char	*check_path_and_perm(char **bin_dir, char **cmd_args, int *perm_err)
 {
 	char	*fullpath;
 	size_t	i;
 
 	i = 0;
+	*perm_err = 0;
 	while (bin_dir[i])
 	{
-		fullpath = join_path(bin_dir[i], cmd_name);
+		fullpath = join_path(bin_dir[i], cmd_args[0]);
 		if (!fullpath)
-			return (NULL);
+		{
+			free_2d_array(bin_dir);
+			malloc_failed(cmd_args);
+		}
 		if (access(fullpath, F_OK) == 0)
 		{
 			if (access(fullpath, X_OK) == 0)
@@ -68,6 +72,7 @@ char	*get_fullpath(char **cmd_args, char **envp)
 {
 	char	**bin_dir;
 	char	*fullpath;
+	char	*envp_path;
 	int		perm_err;
 
 	if (ft_strchr(cmd_args[0], '/'))
@@ -75,17 +80,19 @@ char	*get_fullpath(char **cmd_args, char **envp)
 		if (access(cmd_args[0], F_OK) != 0)
 			no_such_file_or_directory(cmd_args);
 		if (access(cmd_args[0], X_OK) != 0)
-			permission_denied(cmd_args);
+			permission_denied(cmd_args, NULL);
 		return (ft_strdup(cmd_args[0]));
 	}
-	bin_dir = ft_split(find_envp_path(envp), ':');
-	if (!bin_dir)
+	envp_path = find_envp_path(envp);
+	if (!envp_path)
 		return (NULL);
-	perm_err = 0;
-	fullpath = check_path_and_perm(bin_dir, cmd_args[0], &perm_err);
+	bin_dir = ft_split(envp_path, ':');
+	if (!bin_dir)
+		malloc_failed(cmd_args);
+	fullpath = check_path_and_perm(bin_dir, cmd_args, &perm_err);
 	if (fullpath)
 		return (free_2d_array(bin_dir), fullpath);
 	if (perm_err)
-		permission_denied(cmd_args);
+		permission_denied(cmd_args, bin_dir);
 	return (free_2d_array(bin_dir), NULL);
 }
