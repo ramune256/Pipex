@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 13:55:58 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/22 14:01:31 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/22 16:59:02 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,35 +41,45 @@ static char	*join_path(char *bin_dir, char *cmd_name)
 	return (fullpath);
 }
 
+static char	*check_path_and_perm(char **bin_dir, char *cmd_name, int *perm_err)
+{
+	char	*fullpath;
+	size_t	i;
+
+	i = 0;
+	while (bin_dir[i])
+	{
+		fullpath = join_path(bin_dir[i], cmd_name);
+		if (!fullpath)
+			return (NULL);
+		if (access(fullpath, F_OK) == 0)
+		{
+			if (access(fullpath, X_OK) == 0)
+				return (fullpath);
+			*perm_err = 1;
+		}
+		free(fullpath);
+		i++;
+	}
+	return (NULL);
+}
+
 char	*get_fullpath(char **cmd_args, char **envp)
 {
 	char	**bin_dir;
 	char	*fullpath;
-	size_t	i;
-	int		perm;
+	int		perm_err;
 
 	if (ft_strchr(cmd_args[0], '/'))
 		return (ft_strdup(cmd_args[0]));
 	bin_dir = ft_split(find_envp_path(envp), ':');
 	if (!bin_dir)
 		return (NULL);
-	i = 0;
-	perm = 0;
-	while (bin_dir[i])
-	{
-		fullpath = join_path(bin_dir[i], cmd_args[0]);
-		if (!fullpath)
-			return (free_2d_array(bin_dir), NULL);
-		if (access(fullpath, F_OK) == 0)
-		{
-			if (access(fullpath, X_OK) == 0)
-				return (free_2d_array(bin_dir), fullpath);
-			perm = 1;
-		}
-		free(fullpath);
-		i++;
-	}
-	if (perm)
+	perm_err = 0;
+	fullpath = check_path_and_perm(bin_dir, cmd_args[0], &perm_err);
+	if (fullpath)
+		return (free_2d_array(bin_dir), fullpath);
+	if (perm_err)
 		permission_denied(cmd_args);
 	return (free_2d_array(bin_dir), NULL);
 }
