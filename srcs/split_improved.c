@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 15:24:59 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/22 17:34:57 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/22 17:40:40 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ static void	find_next_word(const char *s, int *i, int *start)
 	int	in_quote;
 
 	while (s[*i] == ' ')
-		*i++;
+		(*i)++;
 	*start = *i;
 	in_quote = 0;
 	while (s[*i])
@@ -53,7 +53,7 @@ static void	find_next_word(const char *s, int *i, int *start)
 			in_quote = !in_quote;
 		if (s[*i] == ' ' && in_quote == 0)
 			break ;
-		*i++;
+		(*i)++;
 	}
 }
 
@@ -90,6 +90,7 @@ char	**split_improved(const char *s)
 	result = (char **)malloc(sizeof(char *) * (word_count + 1));
 	if (!result)
 		return (NULL);
+	i = 0;
 	while (i < word_count + 1)
 		result[i++] = NULL;
 	return (fill(s, result, word_count));
