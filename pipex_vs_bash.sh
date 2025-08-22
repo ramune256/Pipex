@@ -8,7 +8,7 @@
 
 set -eu
 
-ROOT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+ROOT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 PIPEX="$ROOT_DIR/pipex"
 WORK_DIR="${ROOT_DIR}/.test_tmp"
 
@@ -32,14 +32,15 @@ run_case() {
 
   rm -f "$out_p" "$out_b" "$err_p" "$err_b"
 
-  # pipex run
+  # Temporarily disable -e so failures don't abort the script
+  set +e
   ("$PIPEX" "$infile" "$cmd1" "$cmd2" "$out_p") 2>"$err_p"
   status_p=$?
 
-  # bash pipeline run; quote-safe via bash -c with args
   bash -c '{ eval "< \"$1\" $2 | $3 > \"$4\""; } 2>"$5"' _ \
     "$infile" "$cmd1" "$cmd2" "$out_b" "$err_b"
   status_b=$?
+  set -e
 
   diff_out="$(diff -u -- "$out_b" "$out_p" 2>&1 || true)"
   diff_err="$(diff -u -- "$err_b" "$err_p" 2>&1 || true)"
