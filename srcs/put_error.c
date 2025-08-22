@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 13:58:57 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/22 19:16:39 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/23 00:34:08 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	malloc_failed(void)
 {
-	ft_putendl_fd("pipex: memory allocation failed", 2);
+	ft_putendl_fd("pipex: Cannot allocate memory", 2);
 	exit(1);
 }
 

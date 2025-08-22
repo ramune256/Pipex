@@ -6,25 +6,11 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 13:55:58 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/22 18:55:41 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/23 00:32:00 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-static int	is_directory(const char *path)
-{
-	int		fd;
-	char	buf;
-
-	fd = open(path, O_RDONLY);
-	if (fd == -1)
-		return (0);
-	if (read(fd, &buf, 1) == -1)
-		return (close(fd), 1);
-	close(fd);
-	return (0);
-}
 
 static char	*find_envp_path(char **envp)
 {
@@ -88,8 +74,6 @@ char	*get_fullpath(char **cmd_args, char **envp)
 	{
 		if (access(cmd_args[0], F_OK) != 0)
 			no_such_file_or_directory(cmd_args);
-		if (is_directory(cmd_args[0]))
-			is_a_directory(cmd_args);
 		if (access(cmd_args[0], X_OK) != 0)
 			permission_denied(cmd_args);
 		return (ft_strdup(cmd_args[0]));
