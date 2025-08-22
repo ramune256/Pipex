@@ -6,13 +6,13 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 19:27:03 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/22 17:42:49 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/22 17:47:03 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	exec_first_command(char *infile, char *cmd1, char **envp, int *pipe_fd)
+void	exec_1st_command(char *infile, char *cmd1, char **envp, int *pipe_fd)
 {
 	int		infile_fd;
 	char	**cmd_args;
@@ -38,7 +38,7 @@ void	exec_first_command(char *infile, char *cmd1, char **envp, int *pipe_fd)
 	error_exit("execve cmd1");
 }
 
-void	exec_second_command(char *outfile, char *cmd2, char **envp, int *pipe_fd)
+void	exec_2nd_command(char *outfile, char *cmd2, char **envp, int *pipe_fd)
 {
 	int		outfile_fd;
 	char	**cmd_args;
@@ -79,12 +79,12 @@ int	main(int argc, char **argv, char **envp)
 	if (pid1 == -1)
 		error_exit("fork");
 	if (pid1 == 0)
-		exec_first_command(argv[1], argv[2], envp, pipe_fd);
+		exec_1st_command(argv[1], argv[2], envp, pipe_fd);
 	pid2 = fork();
 	if (pid2 == -1)
 		error_exit("fork");
 	if (pid2 == 0)
-		exec_second_command(argv[4], argv[3], envp, pipe_fd);
+		exec_2nd_command(argv[4], argv[3], envp, pipe_fd);
 	close_fd(pipe_fd[0], pipe_fd[1], -1);
 	waitpid(pid1, NULL, 0);
 	waitpid(pid2, &status2, 0);
