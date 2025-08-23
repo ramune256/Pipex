@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 13:55:58 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/23 23:23:14 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/23 23:31:42 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ static char *check_absolute_path(char **cmd_args)
 			permission_denied(cmd_args, NULL);
 		return (ft_strdup(cmd_args[0]));
 	}
+	return (NULL);
 }
 
 char	*get_fullpath(char **cmd_args, char **envp)
