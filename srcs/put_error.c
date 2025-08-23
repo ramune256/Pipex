@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 13:58:57 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/23 23:43:45 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/23 23:39:08 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ void	command_not_found(char **cmd_args)
 	if (cmd_args[0])
 		ft_putendl_fd(cmd_args[0], 2);
 	else
-		write(2, "aaaa", 4);
 		ft_putchar_fd('\n', 2);
 	free_2d_array(cmd_args);
 	exit(127);
