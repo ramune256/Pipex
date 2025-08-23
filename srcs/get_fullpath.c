@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 13:55:58 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/23 01:55:53 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/23 23:23:14 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,13 +68,8 @@ static char	*check_path_and_perm(char **bin_dir, char **cmd_args, int *perm_err)
 	return (NULL);
 }
 
-char	*get_fullpath(char **cmd_args, char **envp)
+static char *check_absolute_path(char **cmd_args)
 {
-	char	**bin_dir;
-	char	*fullpath;
-	char	*envp_path;
-	int		perm_err;
-
 	if (ft_strchr(cmd_args[0], '/'))
 	{
 		if (access(cmd_args[0], F_OK) != 0)
@@ -83,6 +78,20 @@ char	*get_fullpath(char **cmd_args, char **envp)
 			permission_denied(cmd_args, NULL);
 		return (ft_strdup(cmd_args[0]));
 	}
+}
+
+char	*get_fullpath(char **cmd_args, char **envp)
+{
+	char	**bin_dir;
+	char	*fullpath;
+	char	*envp_path;
+	int		perm_err;
+
+	if (!cmd_args[0])
+		return (NULL);
+	fullpath = check_absolute_path(cmd_args);
+	if (fullpath)
+		return (fullpath);
 	envp_path = find_envp_path(envp);
 	if (!envp_path)
 		return (NULL);

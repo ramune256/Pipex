@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 13:58:57 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/23 02:38:45 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/23 23:24:50 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ void	malloc_failed(char **cmd_args)
 void	command_not_found(char **cmd_args)
 {
 	ft_putstr_fd("pipex: command not found: ", 2);
-	ft_putendl_fd(cmd_args[0], 2);
+	if (cmd_args[0])
+		ft_putendl_fd(cmd_args[0], 2);
 	free_2d_array(cmd_args);
 	exit(127);
 }
