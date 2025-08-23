@@ -6,7 +6,7 @@
 /*   By: shunwata <shunwata@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 13:55:58 by shunwata          #+#    #+#             */
-/*   Updated: 2025/08/23 23:31:42 by shunwata         ###   ########.fr       */
+/*   Updated: 2025/08/23 23:33:39 by shunwata         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ static char	*check_path_and_perm(char **bin_dir, char **cmd_args, int *perm_err)
 	return (NULL);
 }
 
-static char *check_absolute_path(char **cmd_args)
+static char	*check_absolute_path(char **cmd_args)
 {
 	if (ft_strchr(cmd_args[0], '/'))
 	{
